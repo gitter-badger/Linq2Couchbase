@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Couchbase.Configuration.Client;
 using Couchbase.Core;
+using Couchbase.Linq.ChangeTracking;
 
 namespace Couchbase.Linq
 {
@@ -39,5 +40,29 @@ namespace Couchbase.Linq
         /// <typeparam name="T"></typeparam>
         /// <param name="document">The document.</param>
         void Remove<T>(T document);
+
+        /// <summary>
+        ///  If change tracking is enabled and the documents inherit from <see cref="DocumentBase"/> then
+        ///  any changes will be submitted to the bucket.
+        /// </summary>
+        void SubmitChanges();
+
+        /// <summary>
+        /// Enables change tracking on documents inheriting from <see cref="DocumentBase"/>.
+        /// </summary>
+        void EnableChangeTracking();
+
+        /// <summary>
+        /// If change tracking is enabled, disables it and flushes any documents being tracked.
+        /// </summary>
+        void DisableChangeTracking();
+
+        /// <summary>
+        /// Gets the change tracker for tracking modifications of documents
+        /// </summary>
+        /// <value>
+        /// The change tracker.
+        /// </value>
+        ChangeTracker ChangeTracker { get; }
     }
 }

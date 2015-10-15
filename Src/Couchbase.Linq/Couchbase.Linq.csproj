@@ -70,6 +70,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChangeTracking\ChangeTracker.cs" />
+    <Compile Include="ChangeTracking\ConflictResolution.cs" />
+    <Compile Include="ChangeTracking\DocumentBase.cs" />
     <Compile Include="Clauses\UseKeysExpressionNode.cs" />
     <Compile Include="Clauses\UseKeysClause.cs" />
     <Compile Include="BucketContext.cs" />

@@ -5,6 +5,7 @@ using System.Reflection;
 using Couchbase.Configuration.Client;
 using Couchbase.Core;
 using Couchbase.IO;
+using Couchbase.Linq.ChangeTracking;
 using Couchbase.Linq.Filters;
 using Couchbase.Linq.Utils;
 using Newtonsoft.Json;
@@ -23,6 +24,7 @@ namespace Couchbase.Linq
         public BucketContext(IBucket bucket)
         {
             _bucket = bucket;
+            ChangeTracker = new ChangeTracker(bucket);//TODO needs to be injectable for testing
         }
 
         /// <summary>
@@ -145,6 +147,44 @@ namespace Couchbase.Linq
                 throw new DocumentIdMissingException(ExceptionMsgs.DocumentIdMissing);
             }
             return idName;
+        }
+
+        /// <summary>
+        /// Gets the change tracker for tracking modifications of documents
+        /// </summary>
+        /// <value>
+        /// The change tracker.
+        /// </value>
+        public ChangeTracker ChangeTracker { get; set; }
+
+        /// <summary>
+        /// If change tracking is enabled and the documents inherit from <see cref="DocumentBase" /> then
+        /// any changes will be submitted to the bucket.
+        /// </summary>
+        public void SubmitChanges()
+        {
+            var changes = ChangeTracker.GetChangeSet();
+            foreach (var kv in changes)
+            {
+                //TODO ignoring success/failure atm
+                _bucket.Upsert(kv.Key.Id, kv.Value);
+            }
+        }
+
+        /// <summary>
+        /// Enables change tracking on documents inheriting from <see cref="DocumentBase" />.
+        /// </summary>
+        public void EnableChangeTracking()
+        {
+            ChangeTracker.EnableChangeTracking();
+        }
+
+        /// <summary>
+        /// If change tracking is enabled, disables it and flushes any documents being tracked.
+        /// </summary>
+        public void DisableChangeTracking()
+        {
+            ChangeTracker.DisableChangeTracking();
         }
     }
 }
